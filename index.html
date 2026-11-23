@@ -1,19 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QR Showroom | Platform Console</title>
+  <style>
+    :root{--navy:#10233f;--blue:#1768c4;--bg:#f3f6fa;--line:#e4eaf1;--muted:#66758a;--white:#fff}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#17263b;font:15px Arial,sans-serif}
+    header{background:var(--navy);color:white;padding:17px 20px;display:flex;justify-content:space-between;align-items:center}
+    .logo{font-size:19px;font-weight:800;letter-spacing:1px}.sub{font-size:11px;color:#8bc9d9;margin-top:4px}
+    main{max-width:1100px;margin:24px auto;padding:0 16px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    h1{font-size:25px;margin:0 0 6px}.muted{color:var(--muted);font-size:13px}
+    button{border:0;border-radius:9px;background:var(--blue);color:white;padding:11px 15px;font-weight:700;cursor:pointer}
+    button.ghost{background:#eaf2fc;color:var(--blue)}button.danger{background:#fff0f0;color:#b42318}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+    .card,.panel{background:white;border:1px solid var(--line);border-radius:13px;padding:17px}
+    .metric{font-size:26px;font-weight:800;margin:7px 0}.metric-label{font-size:12px;color:var(--muted)}
+    .layout{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}.panel h2{font-size:17px;margin:0 0 14px}
+    table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .status{font-size:11px;padding:5px 8px;border-radius:20px;background:#e8f7ee;color:#187443}
+    label{display:block;font-size:12px;font-weight:700;margin:10px 0 5px}
+    input,select{width:100%;padding:11px;border:1px solid #d5deea;border-radius:8px;background:white;font-size:14px}
+    .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}
+    .empty{padding:22px;text-align:center;color:var(--muted);font-size:13px}
+    .note{background:#fff8e8;border:1px solid #f4dfa4;color:#72551c;padding:12px;border-radius:10px;font-size:12px;line-height:1.5}
+    footer{text-align:center;padding:24px;color:#8190a2;font-size:11px}
+    @media(max-width:760px){.cards{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}table{min-width:550px}}
+  </style>
+  <!-- Supabase Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<header><div><div class="logo">QR SHOWROOM</div><div class="sub">MULTI-DEALERSHIP DIGITAL SHOWROOM PLATFORM</div></div></header>
+<main>
+  <div class="top"><div><h1>Super Admin Dashboard</h1><div class="muted">Manage dealership onboarding from one central platform</div></div></div>
+  
+  <section class="cards">
+    <div class="card"><div class="metric" id="count">0</div><div class="metric-label">Registered dealerships</div></div>
+    <div class="card"><div class="metric" id="active">0</div><div class="metric-label">Active showrooms</div></div>
+    <div class="card"><div class="metric" id="scans">0</div><div class="metric-label">QR scans (connect analytics)</div></div>
+    <div class="card"><div class="metric" id="bookings">0</div><div class="metric-label">Bookings (connect database)</div></div>
+  </section>
+
+  <div class="layout">
+    <section class="panel"><h2>Dealership directory</h2><div class="tablewrap"><table><thead><tr><th>Dealership</th><th>Brand</th><th>Owner</th><th>Phone</th><th>Location</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+    
+    <section class="panel"><h2>Register a dealership</h2>
+      <form id="form">
+        <label>Dealership / showroom name</label><input id="dealerName" required placeholder="e.g. Yamaha Kamalpur">
+        <div class="formgrid">
+          <div><label>Brand</label><select id="brand"><option>Yamaha</option><option>Suzuki</option><option>Honda</option><option>TVS</option><option>Bajaj</option><option>Hero</option></select></div>
+          <div><label>Owner name</label><input id="owner" required placeholder="Showroom owner"></div>
+        </div>
+        <label>Contact number</label><input id="phone" required type="tel" placeholder="Mobile number">
+        <label>Location</label><input id="location" required placeholder="Town, district, state">
+        <button style="width:100%;margin-top:15px">Add to live database</button>
+      </form>
+      <div class="note"><b>Live Mode:</b> Entries are now saved to your Supabase cloud database.</div>
+    </section>
+  </div>
+
+  <section class="panel" style="margin-top:14px"><h2>Platform modules</h2><div class="cards" style="margin:0">
+    <div class="card"><b>Super Admin</b><p class="muted">Onboard and manage dealerships.</p></div>
+    <div class="card"><b>Dealership Admin</b><p class="muted">Private catalogue management (backend required).</p></div>
+    <div class="card"><b>Dedicated QR</b><p class="muted">Unique showroom entry (secure token service required).</p></div>
+    <div class="card"><b>Customer Showroom</b><p class="muted">Mobile-first catalogue and enquiries.</p></div>
+  </div></section>
+</main>
+<footer>QR-Based Digital Showroom Platform · Initial interface foundation</footer>
+
 <script>
   // ==========================================
-  // SUPABASE CONNECTION DETAILS
+  // PASTE YOUR SUPABASE DETAILS HERE
   // ==========================================
   const SUPABASE_URL = "https://hjtreamfqfunsmhbpvma.supabase.co";
-  const SUPABASE_KEY = "sb_publishable_vaJ_wmk5EIr5H-3I8CGZxQ_tDVgi43s";
+  const SUPABASE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
 
-  // Initialize Supabase (FIXED: renamed to supabaseClient)
-  const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // Initialize Supabase
+  const supabaseClient = supabaseClient.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   function esc(s) {
     return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
   }
 
+  // Fetch data from the Database
   async function draw() {
-    const { data: dealers, error } = await supabaseClient
+    const { data: dealers, error } = await supabase
       .from('dealerships')
       .select('*')
       .order('created_at', { ascending: false });
@@ -43,6 +115,7 @@
     }
   }
 
+  // Submit form to Database
   document.getElementById("form").addEventListener("submit", async function(e) {
     e.preventDefault();
     
@@ -52,7 +125,7 @@
     const phoneVal = document.getElementById("phone").value.trim();
     const locVal = document.getElementById("location").value.trim();
 
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from('dealerships')
       .insert([
         { name: nameVal, brand: brandVal, owner: ownerVal, phone: phoneVal, location: locVal }
@@ -69,3 +142,5 @@
 
   draw();
 </script>
+</body>
+</html>
