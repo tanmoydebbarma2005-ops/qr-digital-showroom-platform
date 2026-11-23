@@ -1,70 +1,129 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>QR Showroom | Platform Console</title>
-<style>
-:root{--navy:#10233f;--blue:#1768c4;--bg:#f3f6fa;--line:#e4eaf1;--muted:#66758a;--white:#fff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:#17263b;font:15px Arial,sans-serif}
-header{background:var(--navy);color:white;padding:17px 20px;display:flex;justify-content:space-between;align-items:center}
-.logo{font-size:19px;font-weight:800;letter-spacing:1px}.sub{font-size:11px;color:#b8c9dd;margin-top:4px}
-main{max-width:1100px;margin:24px auto;padding:0 16px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
-h1{font-size:25px;margin:0 0 6px}.muted{color:var(--muted);font-size:13px}
-button{border:0;border-radius:9px;background:var(--blue);color:white;padding:11px 15px;font-weight:700;cursor:pointer}
-button.ghost{background:#eaf2fc;color:var(--blue)}button.danger{background:#fff0f0;color:#b42318}
-.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
-.card,.panel{background:white;border:1px solid var(--line);border-radius:13px;padding:17px}
-.metric{font-size:26px;font-weight:800;margin:7px 0}.metric-label{font-size:12px;color:var(--muted)}
-.layout{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}.panel h2{font-size:17px;margin:0 0 14px}
-table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-weight:600}
-.status{font-size:11px;padding:5px 8px;border-radius:20px;background:#e8f7ee;color:#187443}
-label{display:block;font-size:12px;font-weight:700;margin:10px 0 5px}
-input,select{width:100%;padding:11px;border:1px solid #d5deea;border-radius:8px;background:white;font-size:14px}
-.formgrid{display:grid;grid-template-columns:1fr 1fr;gap:0 10px}.full{grid-column:1/-1}
-.empty{padding:22px;text-align:center;color:var(--muted);font-size:13px}
-.note{background:#fff8e8;border:1px solid #f4dfaa;color:#72551c;padding:12px;border-radius:10px;font-size:12px;line-height:1.5;margin-top:14px}
-footer{text-align:center;padding:24px;color:#8190a2;font-size:11px}
-@media(max-width:760px){.cards{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}table{min-width:550px}.tablewrap{overflow:auto}.formgrid{grid-template-columns:1fr}}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>QR Showroom | Platform Console</title>
+  <style>
+    :root{--navy:#10233f;--blue:#1768c4;--bg:#f3f6fa;--line:#e4eaf1;--muted:#66758a;--white:#fff}
+    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#17263b;font:15px Arial,sans-serif}
+    header{background:var(--navy);color:white;padding:17px 20px;display:flex;justify-content:space-between;align-items:center}
+    .logo{font-size:19px;font-weight:800;letter-spacing:1px}.sub{font-size:11px;color:#8bc9d9;margin-top:4px}
+    main{max-width:1100px;margin:24px auto;padding:0 16px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    h1{font-size:25px;margin:0 0 6px}.muted{color:var(--muted);font-size:13px}
+    button{border:0;border-radius:9px;background:var(--blue);color:white;padding:11px 15px;font-weight:700;cursor:pointer}
+    button.ghost{background:#eaf2fc;color:var(--blue)}button.danger{background:#fff0f0;color:#b42318}
+    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
+    .card,.panel{background:white;border:1px solid var(--line);border-radius:13px;padding:17px}
+    .metric{font-size:26px;font-weight:800;margin:7px 0}.metric-label{font-size:12px;color:var(--muted)}
+    .layout{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}.panel h2{font-size:17px;margin:0 0 14px}
+    table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--line)}
+    .status{font-size:11px;padding:5px 8px;border-radius:20px;background:#e8f7ee;color:#187443}
+    label{display:block;font-size:12px;font-weight:700;margin:10px 0 5px}
+    input,select{width:100%;padding:11px;border:1px solid #d5deea;border-radius:8px;background:white;font-size:14px}
+    .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}
+    .empty{padding:22px;text-align:center;color:var(--muted);font-size:13px}
+    .note{background:#fff8e8;border:1px solid #f4dfa4;color:#72551c;padding:12px;border-radius:10px;font-size:12px;line-height:1.5}
+    footer{text-align:center;padding:24px;color:#8190a2;font-size:11px}
+    @media(max-width:760px){.cards{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}table{min-width:550px}}
+  </style>
 </head>
 <body>
-<header><div><div class="logo">QR SHOWROOM</div><div class="sub">MULTI-DEALERSHIP DIGITAL SHOWROOM PLATFORM</div></div><div style="font-size:12px">PLATFORM CONSOLE · PREVIEW</div></header>
+<header><div><div class="logo">QR SHOWROOM</div><div class="sub">MULTI-DEALERSHIP DIGITAL SHOWROOM PLATFORM</div></div></header>
 <main>
- <div class="top"><div><h1>Super Admin Dashboard</h1><div class="muted">Manage dealership onboarding from one central platform.</div></div><button onclick="document.getElementById('dealerName').focus()">＋ Add dealership</button></div>
- <section class="cards">
-  <div class="card"><div class="metric" id="count">0</div><div class="metric-label">Registered dealerships</div></div>
-  <div class="card"><div class="metric" id="active">0</div><div class="metric-label">Active showrooms</div></div>
-  <div class="card"><div class="metric">—</div><div class="metric-label">QR scans (connect analytics)</div></div>
-  <div class="card"><div class="metric">—</div><div class="metric-label">Bookings (connect database)</div></div>
- </section>
- <div class="layout">
-  <section class="panel"><h2>Dealership directory</h2><div class="tablewrap"><table><thead><tr><th>Dealership</th><th>Brand</th><th>Location</th><th>Status</th><th>Showroom path</th></tr></thead><tbody id="rows"><tr><td colspan="5" class="empty">No dealerships added yet. Use the form to add your first dealership preview.</td></tr></tbody></table></div></section>
-  <section class="panel"><h2>Register a dealership</h2>
-   <form id="form">
-    <label>Dealership / showroom name</label><input id="dealerName" required placeholder="e.g. Yamaha Kamalpur">
-    <div class="formgrid"><div><label>Brand</label><select id="brand"><option>Yamaha</option><option>Suzuki</option><option>Honda</option><option>TVS</option><option>Other</option></select></div><div><label>Plan</label><select id="plan"><option>6 months</option><option>1 year</option></select></div></div>
-    <label>Owner name</label><input id="owner" required placeholder="Showroom owner">
-    <label>Contact number</label><input id="phone" required type="tel" placeholder="Mobile number">
-    <label>Location</label><input id="location" required placeholder="Town, district, state">
-    <button style="width:100%;margin-top:15px">Add to preview directory</button>
-   </form>
-   <div class="note"><b>Preview mode:</b> Entries are stored only in this browser's temporary local storage. No real account, QR credential, subscription, or server database is created yet.</div>
+  <div class="top"><div><h1>Super Admin Dashboard</h1><div class="muted">Manage dealership onboarding from one central platform</div></div></div>
+  
+  <section class="cards">
+    <div class="card"><div class="metric" id="count">0</div><div class="metric-label">Registered dealerships</div></div>
+    <div class="card"><div class="metric" id="active">0</div><div class="metric-label">Active showrooms</div></div>
+    <div class="card"><div class="metric" id="scans">0</div><div class="metric-label">QR scans (connect analytics)</div></div>
+    <div class="card"><div class="metric" id="bookings">0</div><div class="metric-label">Bookings (connect database)</div></div>
   </section>
- </div>
- <section class="panel" style="margin-top:14px"><h2>Platform modules</h2><div class="cards" style="margin:0">
-  <div class="card"><b>Super Admin</b><p class="muted">Onboard and manage dealerships.</p></div>
-  <div class="card"><b>Dealership Admin</b><p class="muted">Private catalogue management (backend required).</p></div>
-  <div class="card"><b>Dedicated QR</b><p class="muted">Unique showroom entry (secure token service required).</p></div>
-  <div class="card"><b>Customer Showroom</b><p class="muted">Mobile-first catalogue and enquiries.</p></div>
- </div></section>
-</main><footer>QR-Based Digital Showroom Platform · Initial interface foundation</footer>
+
+  <div class="layout">
+    <section class="panel"><h2>Dealership directory</h2><div class="tablewrap"><table><thead><tr><th>Dealership</th><th>Brand</th><th>Owner</th><th>Phone</th><th>Location</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table></div></section>
+    
+    <section class="panel"><h2>Register a dealership</h2>
+      <form id="form">
+        <label>Dealership / showroom name</label><input id="dealerName" required placeholder="e.g. Yamaha Kamalpur">
+        <div class="formgrid">
+          <div><label>Brand</label><select id="brand"><option>Yamaha</option><option>Suzuki</option><option>Honda</option><option>TVS</option><option>Bajaj</option><option>Hero</option></select></div>
+          <div><label>Owner name</label><input id="owner" required placeholder="Showroom owner"></div>
+        </div>
+        <label>Contact number</label><input id="phone" required type="tel" placeholder="Mobile number">
+        <label>Location</label><input id="location" required placeholder="Town, district, state">
+        <button style="width:100%;margin-top:15px">Add to preview directory</button>
+      </form>
+      <div class="note"><b>Preview mode:</b> Entries are stored only in this browser's temporary local storage. No real accounts.</div>
+    </section>
+  </div>
+
+  <section class="panel" style="margin-top:14px"><h2>Platform modules</h2><div class="cards" style="margin:0">
+    <div class="card"><b>Super Admin</b><p class="muted">Onboard and manage dealerships.</p></div>
+    <div class="card"><b>Dealership Admin</b><p class="muted">Private catalogue management (backend required).</p></div>
+    <div class="card"><b>Dedicated QR</b><p class="muted">Unique showroom entry (secure token service required).</p></div>
+    <div class="card"><b>Customer Showroom</b><p class="muted">Mobile-first catalogue and enquiries.</p></div>
+  </div></section>
+</main>
+<footer>QR-Based Digital Showroom Platform · Initial interface foundation</footer>
+
 <script>
-const KEY="qrshowroom_preview_dealers";
-let dealers=[];try{dealers=JSON.parse(localStorage.getItem(KEY)||"[]")}catch(e){}
-function draw(){document.getElementById("count").textContent=dealers.length;document.getElementById("active").textContent=dealers.length;const rows=document.getElementById("rows");if(!dealers.length){rows.innerHTML='<tr><td colspan="5" class="empty">No dealerships added yet.</td></tr>';return}
-rows.innerHTML=dealers.map(d=>`<tr><td><b>${esc(d.name)}</b><br><span class="muted">${esc(d.owner)}</span></td><td>${esc(d.brand)}</td><td>${esc(d.location)}</td><td><span class="status">Preview</span></td><td>/showroom/${slug(d.name)}</td></tr>`).join("")}
-function esc(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
-function slug(s){return s.toLowerCase().trim().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"")}
-document.getElementById("form").addEventListener("submit",e=>{e.preventDefault();dealers.push({name:dealerName.value,brand:brand.value,plan:plan.value,owner:owner.value,phone:phone.value,location:location.value});localStorage.setItem(KEY,JSON.stringify(dealers));e.target.reset();draw();alert("Added to this browser preview only. Connect the secure backend before real dealership onboarding.")});
-draw();
-</script></body></html>
+  const KEY = "qrshowroom_preview_dealers";
+  let dealers = [];
+  try { dealers = JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){}
+
+  function esc(s) {
+    return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+  }
+
+  function draw() {
+    document.getElementById("count").textContent = dealers.length;
+    document.getElementById("active").textContent = dealers.filter(d => d.status === "Active").length;
+    
+    document.getElementById("rows").innerHTML = dealers.map(d => `
+      <tr>
+        <td>${esc(d.name)}</td>
+        <td>${esc(d.brand)}</td>
+        <td>${esc(d.owner)}</td>
+        <td>${esc(d.phone)}</td>
+        <td>${esc(d.location || "Location not set")}</td>
+        <td><span class="status">Active</span></td>
+      </tr>
+    `).join("");
+  }
+
+  document.getElementById("form").addEventListener("submit", function(e) {
+    e.preventDefault();
+    
+    const nameVal = document.getElementById("dealerName").value.trim();
+    const brandVal = document.getElementById("brand").value;
+    const ownerVal = document.getElementById("owner").value.trim();
+    const phoneVal = document.getElementById("phone").value.trim();
+    const locVal = document.getElementById("location").value.trim();
+
+    const isDuplicate = dealers.some(d => d.name.toLowerCase() === nameVal.toLowerCase() && d.location.toLowerCase() === locVal.toLowerCase());
+    
+    if (isDuplicate) {
+      alert("This dealership already exists in your preview list!");
+      return;
+    }
+
+    dealers.push({ 
+      name: nameVal, 
+      brand: brandVal, 
+      owner: ownerVal, 
+      phone: phoneVal, 
+      location: locVal, 
+      status: "Active" 
+    });
+
+    localStorage.setItem(KEY, JSON.stringify(dealers));
+    
+    draw();
+    this.reset(); 
+  });
+
+  draw();
+</script>
+</body>
+</html>
