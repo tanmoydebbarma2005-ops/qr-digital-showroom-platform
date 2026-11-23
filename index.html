@@ -27,6 +27,8 @@
     footer{text-align:center;padding:24px;color:#8190a2;font-size:11px}
     @media(max-width:760px){.cards{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}table{min-width:550px}}
   </style>
+  <!-- Supabase Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <header><div><div class="logo">QR SHOWROOM</div><div class="sub">MULTI-DEALERSHIP DIGITAL SHOWROOM PLATFORM</div></div></header>
@@ -52,9 +54,9 @@
         </div>
         <label>Contact number</label><input id="phone" required type="tel" placeholder="Mobile number">
         <label>Location</label><input id="location" required placeholder="Town, district, state">
-        <button style="width:100%;margin-top:15px">Add to preview directory</button>
+        <button style="width:100%;margin-top:15px">Add to live database</button>
       </form>
-      <div class="note"><b>Preview mode:</b> Entries are stored only in this browser's temporary local storage. No real accounts.</div>
+      <div class="note"><b>Live Mode:</b> Entries are now saved to your Supabase cloud database.</div>
     </section>
   </div>
 
@@ -68,31 +70,53 @@
 <footer>QR-Based Digital Showroom Platform · Initial interface foundation</footer>
 
 <script>
-  const KEY = "qrshowroom_preview_dealers";
-  let dealers = [];
-  try { dealers = JSON.parse(localStorage.getItem(KEY)) || []; } catch(e){}
+  // ==========================================
+  // PASTE YOUR SUPABASE DETAILS HERE
+  // ==========================================
+  const SUPABASE_URL = "https://hjtreamfqfunsmhbpvma.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_vaJ_wmk5EIr5H-3I8CGZxQ_tDVgi43s";
+
+  // Initialize Supabase
+  const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   function esc(s) {
     return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
   }
 
-  function draw() {
+  // Fetch data from the Database
+  async function draw() {
+    const { data: dealers, error } = await supabase
+      .from('dealerships')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error("Error fetching data:", error);
+      alert("Could not fetch data. Check console.");
+      return;
+    }
+
     document.getElementById("count").textContent = dealers.length;
     document.getElementById("active").textContent = dealers.filter(d => d.status === "Active").length;
     
-    document.getElementById("rows").innerHTML = dealers.map(d => `
-      <tr>
-        <td>${esc(d.name)}</td>
-        <td>${esc(d.brand)}</td>
-        <td>${esc(d.owner)}</td>
-        <td>${esc(d.phone)}</td>
-        <td>${esc(d.location || "Location not set")}</td>
-        <td><span class="status">Active</span></td>
-      </tr>
-    `).join("");
+    if (dealers.length === 0) {
+        document.getElementById("rows").innerHTML = `<tr><td colspan="6" style="text-align:center;">No dealerships found. Add one!</td></tr>`;
+    } else {
+        document.getElementById("rows").innerHTML = dealers.map(d => `
+          <tr>
+            <td>${esc(d.name)}</td>
+            <td>${esc(d.brand)}</td>
+            <td>${esc(d.owner)}</td>
+            <td>${esc(d.phone)}</td>
+            <td>${esc(d.location || "Location not set")}</td>
+            <td><span class="status">${esc(d.status)}</span></td>
+          </tr>
+        `).join("");
+    }
   }
 
-  document.getElementById("form").addEventListener("submit", function(e) {
+  // Submit form to Database
+  document.getElementById("form").addEventListener("submit", async function(e) {
     e.preventDefault();
     
     const nameVal = document.getElementById("dealerName").value.trim();
@@ -101,26 +125,19 @@
     const phoneVal = document.getElementById("phone").value.trim();
     const locVal = document.getElementById("location").value.trim();
 
-    const isDuplicate = dealers.some(d => d.name.toLowerCase() === nameVal.toLowerCase() && d.location.toLowerCase() === locVal.toLowerCase());
-    
-    if (isDuplicate) {
-      alert("This dealership already exists in your preview list!");
-      return;
+    const { data, error } = await supabase
+      .from('dealerships')
+      .insert([
+        { name: nameVal, brand: brandVal, owner: ownerVal, phone: phoneVal, location: locVal }
+      ]);
+
+    if (error) {
+      alert("Error saving to database: " + error.message);
+      console.error(error);
+    } else {
+      this.reset(); 
+      draw();
     }
-
-    dealers.push({ 
-      name: nameVal, 
-      brand: brandVal, 
-      owner: ownerVal, 
-      phone: phoneVal, 
-      location: locVal, 
-      status: "Active" 
-    });
-
-    localStorage.setItem(KEY, JSON.stringify(dealers));
-    
-    draw();
-    this.reset(); 
   });
 
   draw();
