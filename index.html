@@ -1,146 +1,461 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>QR Showroom | Platform Console</title>
-  <style>
-    :root{--navy:#10233f;--blue:#1768c4;--bg:#f3f6fa;--line:#e4eaf1;--muted:#66758a;--white:#fff}
-    *{box-sizing:border-box}body{margin:0;background:var(--bg);color:#17263b;font:15px Arial,sans-serif}
-    header{background:var(--navy);color:white;padding:17px 20px;display:flex;justify-content:space-between;align-items:center}
-    .logo{font-size:19px;font-weight:800;letter-spacing:1px}.sub{font-size:11px;color:#8bc9d9;margin-top:4px}
-    main{max-width:1100px;margin:24px auto;padding:0 16px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
-    h1{font-size:25px;margin:0 0 6px}.muted{color:var(--muted);font-size:13px}
-    button{border:0;border-radius:9px;background:var(--blue);color:white;padding:11px 15px;font-weight:700;cursor:pointer}
-    button.ghost{background:#eaf2fc;color:var(--blue)}button.danger{background:#fff0f0;color:#b42318}
-    .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:20px 0}
-    .card,.panel{background:white;border:1px solid var(--line);border-radius:13px;padding:17px}
-    .metric{font-size:26px;font-weight:800;margin:7px 0}.metric-label{font-size:12px;color:var(--muted)}
-    .layout{display:grid;grid-template-columns:1.25fr .75fr;gap:14px}.panel h2{font-size:17px;margin:0 0 14px}
-    table{width:100%;border-collapse:collapse;font-size:13px}th,td{text-align:left;padding:12px 8px;border-bottom:1px solid var(--line)}
-    .status{font-size:11px;padding:5px 8px;border-radius:20px;background:#e8f7ee;color:#187443}
-    label{display:block;font-size:12px;font-weight:700;margin:10px 0 5px}
-    input,select{width:100%;padding:11px;border:1px solid #d5deea;border-radius:8px;background:white;font-size:14px}
-    .formgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.full{grid-column:1/-1}
-    .empty{padding:22px;text-align:center;color:var(--muted);font-size:13px}
-    .note{background:#fff8e8;border:1px solid #f4dfa4;color:#72551c;padding:12px;border-radius:10px;font-size:12px;line-height:1.5}
-    footer{text-align:center;padding:24px;color:#8190a2;font-size:11px}
-    @media(max-width:760px){.cards{grid-template-columns:repeat(2,1fr)}.layout{grid-template-columns:1fr}table{min-width:550px}}
-  </style>
-  <!-- Supabase Library -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ShowroomQR — 30-Item Multi-Dealer QR Catalog</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 </head>
-<body>
-<header><div><div class="logo">QR SHOWROOM</div><div class="sub">MULTI-DEALERSHIP DIGITAL SHOWROOM PLATFORM</div></div></header>
-<main>
-  <div class="top"><div><h1>Super Admin Dashboard</h1><div class="muted">Manage dealership onboarding from one central platform</div></div></div>
-  
-  <section class="cards">
-    <div class="card"><div class="metric" id="count">0</div><div class="metric-label">Registered dealerships</div></div>
-    <div class="card"><div class="metric" id="active">0</div><div class="metric-label">Active showrooms</div></div>
-    <div class="card"><div class="metric" id="scans">0</div><div class="metric-label">QR scans (connect analytics)</div></div>
-    <div class="card"><div class="metric" id="bookings">0</div><div class="metric-label">Bookings (connect database)</div></div>
-  </section>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen">
 
-  <div class="layout">
-    <section class="panel"><h2>Dealership directory</h2><div class="tablewrap"><table><thead><tr><th>Dealership</th><th>Brand</th><th>Owner</th><th>Phone</th><th>Location</th><th>Status</th></tr></thead><tbody id="rows"></tbody></table></div></section>
-    
-    <section class="panel"><h2>Register a dealership</h2>
-      <form id="form">
-        <label>Dealership / showroom name</label><input id="dealerName" required placeholder="e.g. Yamaha Kamalpur">
-        <div class="formgrid">
-          <div><label>Brand</label><select id="brand"><option>Yamaha</option><option>Suzuki</option><option>Honda</option><option>TVS</option><option>Bajaj</option><option>Hero</option></select></div>
-          <div><label>Owner name</label><input id="owner" required placeholder="Showroom owner"></div>
+  <!-- Top Navigation Bar -->
+  <header class="bg-slate-900 text-white px-4 py-3 flex justify-between items-center sticky top-0 z-50 shadow-md">
+    <div class="flex items-center gap-2 cursor-pointer" onclick="switchMode('dealer')">
+      <span class="bg-amber-500 text-slate-950 font-black px-2 py-0.5 rounded text-sm">QR</span>
+      <div>
+        <h1 class="font-bold text-base leading-none">ShowroomQR</h1>
+        <p class="text-[10px] text-slate-400">30-Item Dealer Catalog</p>
+      </div>
+    </div>
+
+    <div class="flex bg-slate-800 p-1 rounded-lg text-xs font-medium">
+      <button id="tab-dealer" onclick="switchMode('dealer')" class="px-3 py-1.5 rounded-md bg-amber-500 text-slate-950 font-bold transition">
+        Dealer Admin
+      </button>
+      <button id="tab-customer" onclick="switchMode('customer')" class="px-3 py-1.5 rounded-md text-slate-300 hover:text-white transition">
+        Customer View
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-lg mx-auto p-4 pb-24">
+
+    <!-- ==================== 1. DEALER ADMIN DASHBOARD ==================== -->
+    <section id="view-dealer" class="space-y-5">
+
+      <!-- Shop Switcher / Create New Shop -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200 space-y-3">
+        <div class="flex justify-between items-center">
+          <label class="text-xs font-bold uppercase tracking-wider text-slate-500">Active Shop Account</label>
+          <button onclick="toggleNewShopForm()" class="text-xs font-semibold text-amber-600 hover:underline">
+            + Register New Shop
+          </button>
         </div>
-        <label>Contact number</label><input id="phone" required type="tel" placeholder="Mobile number">
-        <label>Location</label><input id="location" required placeholder="Town, district, state">
-        <button style="width:100%;margin-top:15px">Add to live database</button>
-      </form>
-      <div class="note"><b>Live Mode:</b> Entries are now saved to your Supabase cloud database.</div>
+
+        <select id="shop-selector" onchange="selectShop(this.value)" class="w-full bg-slate-50 border border-slate-300 rounded-xl px-3 py-2 text-sm font-bold text-slate-900 focus:outline-none focus:border-amber-500"></select>
+
+        <!-- Hidden New Shop Form -->
+        <form id="new-shop-form" onsubmit="createShop(event)" class="hidden pt-3 border-t border-slate-100 space-y-2.5">
+          <input type="text" id="shop-name" placeholder="Showroom / Shop Name (e.g., Horizon Honda)" required class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2" />
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="shop-city" placeholder="Location (e.g., Agartala)" required class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2" />
+            <input type="tel" id="shop-whatsapp" placeholder="WhatsApp (e.g., 919876543210)" required class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2" />
+          </div>
+          <button type="submit" class="w-full bg-slate-900 text-white text-xs font-bold py-2.5 rounded-lg hover:bg-slate-800">
+            Create Shop & Unlock 30 Free Slots
+          </button>
+        </form>
+
+        <!-- Shop Summary & Storefront QR -->
+        <div class="pt-3 border-t border-slate-100 flex justify-between items-center">
+          <div>
+            <p id="active-shop-meta" class="text-xs text-slate-500"></p>
+          </div>
+          <button onclick="openShopQr()" class="bg-slate-900 text-white text-xs px-3 py-2 rounded-lg font-semibold hover:bg-slate-800 flex items-center gap-1.5">
+            <span>Showroom QR</span>
+          </button>
+        </div>
+
+        <!-- 30-Item Limit Meter -->
+        <div class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+          <div class="flex justify-between text-xs font-bold mb-1.5">
+            <span class="text-slate-700">Free Catalog Limit (Max 30)</span>
+            <span id="slot-counter" class="text-amber-600">0 / 30 Items</span>
+          </div>
+          <div class="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden">
+            <div id="slot-bar" class="bg-amber-500 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Product / Bike Form -->
+      <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-200">
+        <h2 class="font-bold text-sm text-slate-800 mb-3">+ Add Vehicle / Product</h2>
+        <form id="product-form" onsubmit="addProduct(event)" class="space-y-3">
+          <input type="text" id="prod-name" placeholder="Model Name (e.g., Royal Enfield Classic 350)" required class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-amber-500" />
+          
+          <div class="grid grid-cols-2 gap-2">
+            <input type="text" id="prod-spec" placeholder="Key Spec (e.g., 349cc • 35 kmpl)" required class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-amber-500" />
+            <input type="text" id="prod-colors" placeholder="Colors (Black, Red, Chrome)" required class="w-full text-sm border border-slate-300 rounded-lg px-3 py-2 focus:outline-none focus:border-amber-500" />
+          </div>
+
+          <!-- Variant & Price Builder -->
+          <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 space-y-2">
+            <div class="flex justify-between items-center">
+              <span class="text-xs font-bold text-slate-600">Variants & On-Road Prices</span>
+              <button type="button" onclick="addVariantRow()" class="text-xs font-bold text-amber-600 hover:underline">+ Add Variant</button>
+            </div>
+            <div id="variant-inputs" class="space-y-2">
+              <div class="grid grid-cols-2 gap-2 variant-row">
+                <input type="text" placeholder="Variant (e.g., Standard)" required class="v-name text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white" />
+                <input type="number" placeholder="Price in ₹ (e.g., 193000)" required class="v-price text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white" />
+              </div>
+            </div>
+          </div>
+
+          <button id="submit-prod-btn" type="submit" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-sm py-2.5 rounded-xl transition shadow-sm">
+            Save Item & Generate QR Code
+          </button>
+        </form>
+      </div>
+
+      <!-- Dealer Inventory List -->
+      <div>
+        <div class="flex justify-between items-center mb-2 px-1">
+          <h3 class="font-bold text-sm text-slate-700">Showroom Catalog Items</h3>
+          <span class="text-[11px] text-slate-400">Tap QR to print/preview</span>
+        </div>
+        <div id="dealer-inventory" class="space-y-3"></div>
+      </div>
     </section>
+
+    <!-- ==================== 2. CUSTOMER SCAN VIEW ==================== -->
+    <section id="view-customer" class="hidden space-y-4">
+      <!-- Showroom Banner -->
+      <div class="bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white p-5 rounded-2xl shadow-md">
+        <div class="flex justify-between items-start">
+          <div>
+            <span class="inline-block bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold uppercase px-2 py-0.5 rounded-full">
+              Official Digital Catalog
+            </span>
+            <h2 id="cust-shop-name" class="text-2xl font-extrabold mt-1"></h2>
+            <p id="cust-shop-city" class="text-xs text-slate-300 mt-0.5"></p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Focused Scanned Product Banner (Shown when user scans a specific bike QR) -->
+      <div id="focused-banner" class="hidden bg-amber-50 border border-amber-300 p-3 rounded-xl flex justify-between items-center">
+        <span class="text-xs font-semibold text-amber-900">Showing scanned bike first</span>
+        <button onclick="clearFocusedProduct()" class="text-xs font-bold text-amber-700 underline">View All Models</button>
+      </div>
+
+      <!-- Customer Product Feed -->
+      <div id="customer-catalog" class="space-y-4"></div>
+    </section>
+
+  </main>
+
+  <!-- ==================== QR CODE MODAL ==================== -->
+  <div id="qr-modal" class="fixed inset-0 bg-black/70 hidden items-center justify-center p-4 z-50 backdrop-blur-xs">
+    <div class="bg-white rounded-2xl p-6 max-w-xs w-full text-center shadow-2xl space-y-3">
+      <span class="text-[10px] font-bold uppercase tracking-wider bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full">Scan with Phone Camera</span>
+      <h3 id="modal-title" class="font-extrabold text-lg text-slate-900 leading-tight"></h3>
+      <p id="modal-subtitle" class="text-xs text-slate-500"></p>
+      
+      <div id="qrcode-box" class="my-3 flex justify-center p-4 bg-white rounded-xl border-2 border-dashed border-slate-300"></div>
+      
+      <p id="modal-link" class="text-[10px] text-slate-400 break-all bg-slate-50 p-2 rounded"></p>
+      
+      <div class="grid grid-cols-2 gap-2 pt-2">
+        <button onclick="simulateScan()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 py-2 rounded-xl text-xs font-bold">
+          Simulate Scan
+        </button>
+        <button onclick="closeModal()" class="bg-slate-900 hover:bg-slate-800 text-white py-2 rounded-xl text-xs font-bold">
+          Close
+        </button>
+      </div>
+    </div>
   </div>
 
-  <section class="panel" style="margin-top:14px"><h2>Platform modules</h2><div class="cards" style="margin:0">
-    <div class="card"><b>Super Admin</b><p class="muted">Onboard and manage dealerships.</p></div>
-    <div class="card"><b>Dealership Admin</b><p class="muted">Private catalogue management (backend required).</p></div>
-    <div class="card"><b>Dedicated QR</b><p class="muted">Unique showroom entry (secure token service required).</p></div>
-    <div class="card"><b>Customer Showroom</b><p class="muted">Mobile-first catalogue and enquiries.</p></div>
-  </div></section>
-</main>
-<footer>QR-Based Digital Showroom Platform · Initial interface foundation</footer>
+  <script>
+    const MAX_ITEMS_PER_SHOP = 30;
+    const STORAGE_KEY = 'showroom_qr_data_v1';
 
-<script>
-  // ==========================================
-  // PASTE YOUR SUPABASE DETAILS HERE
-  // ==========================================
-  const SUPABASE_URL = "https://hjtreamfqfunsmhbpvma.supabase.co";
-  const SUPABASE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
+    // Default Demo Data
+    const defaultData = {
+      activeShopId: 'shop-1',
+      shops: [
+        {
+          id: 'shop-1',
+          name: 'Apex Two-Wheelers',
+          city: 'Agartala, Tripura',
+          whatsapp: '919876543210',
+          products: [
+            {
+              id: 'p-101',
+              name: 'Yamaha MT-15 V2',
+              spec: '155cc Liquid Cooled • 48 kmpl',
+              colors: ['Metallic Black', 'Cyan Storm', 'Ice Fluo'],
+              variants: [
+                { name: 'Standard', price: 168900 },
+                { name: 'Deluxe MotoGP', price: 173500 }
+              ]
+            },
+            {
+              id: 'p-102',
+              name: 'TVS Apache RTR 160 4V',
+              spec: '159.7cc • Ride Modes',
+              colors: ['Racing Red', 'Knight Black'],
+              variants: [
+                { name: 'Drum Brake', price: 124870 },
+                { name: 'Single Disc', price: 128500 },
+                { name: 'Dual Channel ABS', price: 135200 }
+              ]
+            }
+          ]
+        }
+      ]
+    };
 
-  // Initialize Supabase
-  const supabaseClient = supabaseClient.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let appState = JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
+    let focusedProductId = null;
+    let pendingSimulatedHash = '';
 
-  function esc(s) {
-    return String(s || "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
-  }
-
-  // Fetch data from the Database
-  async function draw() {
-    const { data: dealers, error } = await supabase
-      .from('dealerships')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error("Error fetching data:", error);
-      alert("Could not fetch data. Check console.");
-      return;
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(appState));
     }
 
-    document.getElementById("count").textContent = dealers.length;
-    document.getElementById("active").textContent = dealers.filter(d => d.status === "Active").length;
-    
-    if (dealers.length === 0) {
-        document.getElementById("rows").innerHTML = `<tr><td colspan="6" style="text-align:center;">No dealerships found. Add one!</td></tr>`;
-    } else {
-        document.getElementById("rows").innerHTML = dealers.map(d => `
-          <tr>
-            <td>${esc(d.name)}</td>
-            <td>${esc(d.brand)}</td>
-            <td>${esc(d.owner)}</td>
-            <td>${esc(d.phone)}</td>
-            <td>${esc(d.location || "Location not set")}</td>
-            <td><span class="status">${esc(d.status)}</span></td>
-          </tr>
-        `).join("");
+    function getActiveShop() {
+      return appState.shops.find(s => s.id === appState.activeShopId) || appState.shops[0];
     }
-  }
 
-  // Submit form to Database
-  document.getElementById("form").addEventListener("submit", async function(e) {
-    e.preventDefault();
-    
-    const nameVal = document.getElementById("dealerName").value.trim();
-    const brandVal = document.getElementById("brand").value;
-    const ownerVal = document.getElementById("owner").value.trim();
-    const phoneVal = document.getElementById("phone").value.trim();
-    const locVal = document.getElementById("location").value.trim();
-
-    const { data, error } = await supabase
-      .from('dealerships')
-      .insert([
-        { name: nameVal, brand: brandVal, owner: ownerVal, phone: phoneVal, location: locVal }
-      ]);
-
-    if (error) {
-      alert("Error saving to database: " + error.message);
-      console.error(error);
-    } else {
-      this.reset(); 
-      draw();
+    // ==================== SHOP MANAGEMENT ====================
+    function toggleNewShopForm() {
+      document.getElementById('new-shop-form').classList.toggle('hidden');
     }
-  });
 
-  draw();
-</script>
-</body>
-</html>
+    function createShop(e) {
+      e.preventDefault();
+      const name = document.getElementById('shop-name').value.trim();
+      const city = document.getElementById('shop-city').value.trim();
+      const whatsapp = document.getElementById('shop-whatsapp').value.replace(/\D/g, '');
+
+      const newShop = {
+        id: 'shop-' + Date.now(),
+        name,
+        city,
+        whatsapp,
+        products: []
+      };
+
+      appState.shops.push(newShop);
+      appState.activeShopId = newShop.id;
+      saveState();
+
+      e.target.reset();
+      toggleNewShopForm();
+      renderAll();
+    }
+
+    function selectShop(shopId) {
+      appState.activeShopId = shopId;
+      focusedProductId = null;
+      saveState();
+      renderAll();
+    }
+
+    // ==================== PRODUCT & 30-ITEM LIMIT ====================
+    function addVariantRow() {
+      const container = document.getElementById('variant-inputs');
+      const row = document.createElement('div');
+      row.className = 'grid grid-cols-2 gap-2 variant-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Variant (e.g., ABS Pro)" required class="v-name text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white" />
+        <input type="number" placeholder="Price in ₹" required class="v-price text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white" />
+      `;
+      container.appendChild(row);
+    }
+
+    function addProduct(e) {
+      e.preventDefault();
+      const shop = getActiveShop();
+      if (shop.products.length >= MAX_ITEMS_PER_SHOP) {
+        alert('You have reached the 30-item limit for this shop.');
+        return;
+      }
+
+      const name = document.getElementById('prod-name').value.trim();
+      const spec = document.getElementById('prod-spec').value.trim();
+      const colors = document.getElementById('prod-colors').value.split(',').map(c => c.trim()).filter(Boolean);
+
+      const variantRows = document.querySelectorAll('#variant-inputs .variant-row');
+      const variants = [];
+      variantRows.forEach(row => {
+        const vName = row.querySelector('.v-name').value.trim();
+        const vPrice = Number(row.querySelector('.v-price').value);
+        if (vName && vPrice) variants.push({ name: vName, price: vPrice });
+      });
+
+      const newProduct = {
+        id: 'p-' + Date.now(),
+        name,
+        spec,
+        colors,
+        variants
+      };
+
+      shop.products.unshift(newProduct);
+      saveState();
+
+      // Reset form & variant rows
+      e.target.reset();
+      document.getElementById('variant-inputs').innerHTML = `
+        <div class="grid grid-cols-2 gap-2 variant-row">
+          <input type="text" placeholder="Variant (e.g., Standard)" required class="v-name text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white" />
+          <input type="number" placeholder="Price in ₹ (e.g., 193000)" required class="v-price text-xs border border-slate-300 rounded-lg px-2.5 py-1.5 bg-white" />
+        </div>
+      `;
+
+      renderAll();
+      openProductQr(newProduct.id);
+    }
+
+    function deleteProduct(prodId) {
+      const shop = getActiveShop();
+      shop.products = shop.products.filter(p => p.id !== prodId);
+      saveState();
+      renderAll();
+    }
+
+    // ==================== QR GENERATION & DEEP LINKING ====================
+    function buildQrUrl(shopId, prodId = '') {
+      const baseUrl = window.location.href.split('#')[0];
+      const hash = prodId ? `#scan=${shopId}/${prodId}` : `#scan=${shopId}`;
+      return { fullUrl: baseUrl + hash, hash };
+    }
+
+    function openShopQr() {
+      const shop = getActiveShop();
+      const { fullUrl, hash } = buildQrUrl(shop.id);
+      showQrModal(shop.name, 'Full Showroom Catalog (All Models)', fullUrl, hash);
+    }
+
+    function openProductQr(prodId) {
+      const shop = getActiveShop();
+      const prod = shop.products.find(p => p.id === prodId);
+      if (!prod) return;
+      const { fullUrl, hash } = buildQrUrl(shop.id, prod.id);
+      showQrModal(prod.name, `${shop.name} • Direct Bike QR`, fullUrl, hash);
+    }
+
+    function showQrModal(title, subtitle, url, hash) {
+      document.getElementById('modal-title').innerText = title;
+      document.getElementById('modal-subtitle').innerText = subtitle;
+      document.getElementById('modal-link').innerText = url;
+      pendingSimulatedHash = hash;
+
+      const box = document.getElementById('qrcode-box');
+      box.innerHTML = '';
+      new QRCode(box, {
+        text: url,
+        width: 170,
+        height: 170,
+        colorDark: '#0f172a',
+        colorLight: '#ffffff',
+        correctLevel: QRCode.CorrectLevel.H
+      });
+
+      const modal = document.getElementById('qr-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('qr-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function simulateScan() {
+      closeModal();
+      window.location.hash = pendingSimulatedHash;
+      handleHashNavigation();
+    }
+
+    function handleHashNavigation() {
+      const hash = window.location.hash;
+      if (hash.startsWith('#scan=')) {
+        const path = hash.replace('#scan=', '');
+        const [shopId, prodId] = path.split('/');
+        if (appState.shops.some(s => s.id === shopId)) {
+          appState.activeShopId = shopId;
+        }
+        focusedProductId = prodId || null;
+        switchMode('customer');
+      }
+    }
+
+    function clearFocusedProduct() {
+      focusedProductId = null;
+      history.replaceState(null, '', window.location.pathname);
+      renderCustomerView();
+    }
+
+    // ==================== RENDERING ====================
+    function formatINR(num) {
+      return '₹' + Number(num).toLocaleString('en-IN');
+    }
+
+    function renderAll() {
+      const shop = getActiveShop();
+
+      // Populate shop dropdown
+      const selector = document.getElementById('shop-selector');
+      selector.innerHTML = appState.shops.map(s =>
+        `<option value="${s.id}" ${s.id === shop.id ? 'selected' : ''}>${s.name} (${s.products.length}/30)</option>`
+      ).join('');
+
+      document.getElementById('active-shop-meta').innerText = `${shop.city} • WhatsApp: +${shop.whatsapp}`;
+
+      // Update 30-item counter
+      const count = shop.products.length;
+      document.getElementById('slot-counter').innerText = `${count} / ${MAX_ITEMS_PER_SHOP} Items`;
+      document.getElementById('slot-bar').style.width = `${(count / MAX_ITEMS_PER_SHOP) * 100}%`;
+
+      const submitBtn = document.getElementById('submit-prod-btn');
+      if (count >= MAX_ITEMS_PER_SHOP) {
+        submitBtn.disabled = true;
+        submitBtn.innerText = '30-Item Limit Reached (Delete an item to add more)';
+        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+      } else {
+        submitBtn.disabled = false;
+        submitBtn.innerText = 'Save Item & Generate QR Code';
+        submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+      }
+
+      // Render Dealer Inventory
+      const invContainer = document.getElementById('dealer-inventory');
+      if (shop.products.length === 0) {
+        invContainer.innerHTML = `<div class="bg-white p-6 rounded-2xl text-center text-xs text-slate-400 border border-dashed border-slate-300">No items added yet. Use the form above to add up to 30 products.</div>`;
+      } else {
+        invContainer.innerHTML = shop.products.map(p => `
+          <div class="bg-white p-3.5 rounded-2xl border border-slate-200 shadow-xs flex justify-between items-center gap-3">
+            <div class="min-w-0 flex-1">
+              <h4 class="font-bold text-sm text-slate-900 truncate">${p.name}</h4>
+              <p class="text-xs text-slate-500">${p.spec}</p>
+              <p class="text-xs font-bold text-amber-700 mt-1">Starting ${formatINR(p.variants[0]?.price || 0)} • ${p.variants.length} Variant(s)</p>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <button onclick="openProductQr('${p.id}')" class="bg-amber-100 hover:bg-amber-200 text-amber-900 font-bold text-xs px-3 py-2 rounded-xl">
+                QR Code
+              </button>
+              <button onclick="deleteProduct('${p.id}')" class="text-xs text-red-500 hover:text-red-700 px-1.5 py-2">
+                ✕
+              </button>
+            </div>
+          </div>
+        `).join('');
+      }
+
+      renderCustomerView();
+    }
+
+    function renderCustomerView() {
+      const shop = getActiveShop();
+      document.getElementById('cust-shop-name').innerText = shop.name;
+      document.getElementById('cust-shop-city').innerText = shop.city;
+
+      const focusedBanner = document.getElementById('focused-banner');
+ 
